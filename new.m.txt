@@ -1,0 +1,170 @@
+function new(rn,rm,rj,rb,rk,rc,rd,re,rg,rf,rh,ri,count)
+
+clc
+% close all
+
+% rn=38.73;rm=15;rj=50;rb=41.5;rk = 61.9;rc = 39.3;rd = 40.1;re = 55.8;rg =36.7;rf = 39.4;
+% rh =65.7;
+% % ri = 49.0;
+% ri = 49.0 + 3;
+t = 0:5/180:10;
+ang_speed = -pi/5;
+thetam = ang_speed*t;
+thetan = atan(7.8/38);
+thetae = real(acos((rb^2+rd^2-re^2)/(2*rb*rd)));
+thetah = real(acos((rg^2+ri^2-rh^2)/(2*rg*ri)));
+
+thetab= zeros(1,length(t));
+thetaj = zeros(1,length(t));
+thetak = zeros(1,length(t));
+thetac = zeros(1,length(t));
+thetad = zeros(1,length(t));
+thetag = zeros(1,length(t));
+thetaf = zeros(1,length(t));
+thetai = zeros(1,length(t));
+thetap = zeros(1,length(t));
+
+
+Ax = zeros(1,length(t));
+Ay = zeros(1,length(t));
+Bx = zeros(1,length(t));
+By = zeros(1,length(t));
+Box = zeros(1,length(t));
+Boy = zeros(1,length(t));
+F5x = zeros(1,length(t));
+F5y = zeros(1,length(t));
+G5x = zeros(1,length(t));
+G5y = zeros(1,length(t));
+H5x = zeros(1,length(t));
+H5y = zeros(1,length(t));
+Px =  zeros(1,length(t));
+Py = zeros(1,length(t));
+
+
+for i=1:length(thetam)
+    
+k1 = rn^2+rm^2+rb^2-rj^2+2*rn*rm*cos(thetan-thetam(i));
+k2 = 2*rn*rb;
+k3 = 2*rm*rb;
+
+p = k1+k2*cos(thetan)+k3*cos(thetam(i));
+q = -2*(sin(thetan)*k2+sin(thetam(i))*k3);
+r = k1-k2*cos(thetan)-k3*cos(thetam(i));
+
+[y1,y2] = quard(p,q,r);
+
+thetab(i) = 2*atan(y1);
+thetaj(i) =acos((rn*cos(thetan)+rm*cos(thetam(i))-rb*cos(thetab(i)))/rj);
+
+
+k11 = rn^2+rm^2+rc^2-rk^2+2*rn*rm*cos(thetan-thetam(i));
+k21 = 2*rn*rc;
+k31 = 2*rm*rc;
+
+p1 = k11+k21*cos(thetan)+k31*cos(thetam(i));
+q1= -2*(sin(thetan)*k21+sin(thetam(i))*k31);
+r1 = k11-k21*cos(thetan)-k31*cos(thetam(i));
+
+[y11,y21] = quard(p1,q1,r1);
+
+thetac(i) = 2*atan(y21);
+thetak(i) =acos((rn*cos(thetan)+rm*cos(thetam(i))-rc*cos(thetac(i)))/rk);
+
+
+
+thetad(i) = pi+thetae+thetab(i);
+
+k111 = rd^2+rc^2+rg^2-rf^2+2*rd*rc*cos(thetad(i)-thetac(i));
+k211 = 2*rd*rg;
+k311 = 2*rc*rg;
+
+p11 = k111+k211*cos(thetad(i))+k311*cos(thetac(i));
+q11 = -2*(sin(thetad(i))*k211+sin(thetac(i))*k311);
+r11 = k111-k211*cos(thetad(i))-k311*cos(thetac(i));
+
+[y111,y211] = quard(p11,q11,r11);
+
+%based on what i am finding here g or f we have to change it is y1 or y2
+
+thetag(i) = 2*atan(y111);
+thetaf(i) =acos((rd*cos(thetad(i))+rc*cos(thetac(i))-rg*cos(thetag(i)))/rf);
+
+ thetai(i) = thetag(i)+thetah-pi;
+
+
+Ax(i) = real(rn*cos(thetan)+ rm*cos(thetam(i)));
+Ay(i) = real(rn*sin(thetan)+rm*sin(thetam(i)));
+Bx(i) = real(rb*cos(thetab(i)));
+By(i) = real(rb*sin(thetab(i)));
+Box(i) = real(rn*cos(thetan));
+Boy(i) = real(rn*sin(thetan));
+
+F5x(i) = real(rc*cos(thetac(i)));
+F5y(i) = real(rc*sin(thetac(i)));
+
+G5x(i) = -real(rd*cos(thetad(i)));
+G5y(i) = -real(rd*sin(thetad(i)));
+
+H5x(i) = real(F5x(i) - rg*cos(thetag(i)));
+H5y(i) = real(F5y(i) - rg*sin(thetag(i)));
+
+Px(i) = real(ri*cos(thetai(i))+rc*cos(thetac(i)));
+Py(i) = real(ri*sin(thetai(i))+rc*sin(thetac(i)));
+
+
+
+  %sqrt((H5x(i)-G5x(i))^2+(H5y(i)-G5y(i))^2)
+% figure(1)
+% plot([Box(i) Ax(i)], [Boy(i) Ay(i)],'ro-','LineWidth',5);hold on; %r2
+%  plot([Ax(i) Bx(i)], [Ay(i) By(i)], 'go-','LineWidth',5); hold on; %r3
+%  plot([Bx(i) 0], [By(i) 0], 'bo-','LineWidth',5); hold on; %r4
+%  plot([Ax(i) F5x(i)], [Ay(i) F5y(i)], 'yo-','LineWidth',5); hold on; %r5
+% plot([F5x(i) 0], [F5y(i) 0], 'ko-','LineWidth',5); hold on; %r6
+%  plot([G5x(i) 0], [G5y(i) 0], 'mo-','LineWidth',5); hold on; %r6
+%  plot([G5x(i) Bx(i)], [G5y(i) By(i)], 'ko-','LineWidth',5); hold on; %r6
+% plot([H5x(i) G5x(i)], [H5y(i) G5y(i)], 'ro-','LineWidth',5); hold on; %r6
+% plot([H5x(i) F5x(i)], [H5y(i) F5y(i)], 'go-','LineWidth',5); hold on; %r6
+% plot([F5x(i) Px(i)], [F5y(i) Py(i)], 'Ko-','LineWidth',1); hold on; %r6%
+% plot([H5x(i) Px(i)], [H5y(i) Py(i)], 'Yo-','LineWidth',1); hold on; %r6
+% plot([Box(i) 0], [Boy(i) 0], 'co-','LineWidth',5);hold off; %r1
+% 
+% grid on
+% axis([-100 100 -100 100]);
+% pause(0.0001);
+
+end
+
+if(count <= 4)
+
+    figure(2)
+    title("changing rm,rn,rj,rb");
+    subplot(2,2,count);
+    plot(Px,Py);
+
+
+
+elseif(count > 4 && count <=8)
+
+    figure(3)
+    subplot(2,2,count-4);
+    plot(Px,Py);
+
+elseif(count > 8 && count <= 12)
+
+    figure(4)
+    subplot(2,2,count-8);
+    plot(Px,Py);
+
+
+else 
+    figure(5)
+    plot(Px,Py);
+
+end
+
+
+end
+
+
+
+

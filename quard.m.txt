@@ -1,0 +1,22 @@
+function [y1,y2] = quard(a,b,c)
+
+D = b^2 - 4*a*c;
+
+% Check for real roots
+if D < 0
+    disp('The roots are complex');
+    y1=0;
+    y2 = 0;
+elseif D == 0
+    % Calculation of real and equal roots
+    y1 = -b/(2*a);
+    y2 = y1;
+   
+else
+    % Calculation of real and distinct roots
+    y1 = (-b + sqrt(D))/(2*a);
+    y2 = (-b - sqrt(D))/(2*a);
+
+end
+
+end
